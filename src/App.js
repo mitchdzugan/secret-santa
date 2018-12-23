@@ -118,8 +118,76 @@ class App extends Component {
     );
   }
 
+	renderChat (p, id, personId, title) {
+    const messages = p.messages || [];
+    const messagesEl = !messages.length ?
+      <div className="emptyMessages">no messages</div> : messages.map(
+        ({ from, body }, ind) => (
+          <div key={ind} className={`message ${from === personId ? 'fromMe' : 'fromOther'}`}>
+            <div className="messageSpacer" />
+            <div className="messageBody" >
+              {body}
+            </div>
+          </div>
+        )
+      );
+
+    const send = () => {
+      const message = {
+        from: personId,
+        body: this[id].value,
+      };
+      db.collection('People').doc(id).set({
+        ...p,
+        messages: [
+          ...messages,
+          message
+        ]
+      }).then(() => {
+        this[id].value = '';
+      });
+    };
+
+    const onKeyDown = e => {
+      if (e.keyCode === 13) {
+        send();
+      }
+    }
+
+		return (
+			<div className="chat">
+				<div className="header">
+          Chat with <strong>{title || p.Name}</strong>
+				</div>
+				<div className="messages">
+          {messagesEl}
+				</div>
+				<div className="input">
+          <input
+            onKeyDown={onKeyDown}
+            ref={ref => {this[id] = ref;}} 
+          />
+          <button onClick={send} >send</button>
+				</div>
+			</div>
+		);
+	}
+
   render () {
-    return <div className="letter"> {this.renderContent()} </div>;
+		const fullyLoaded = this.state.to && this.state.you;
+    return (
+			<div>
+				<div className="letter">
+					{this.renderContent()}
+				</div>
+				{fullyLoaded && (
+					<div className="chatsHolder">
+            {this.renderChat(this.state.to, this.state.code.toId, this.state.code.personId)}
+            {this.renderChat(this.state.you, this.state.code.personId, this.state.code.personId, 'your santa')}
+					</div>
+				)}
+			</div>
+		);
   }
 }
 
