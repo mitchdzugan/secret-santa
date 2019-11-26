@@ -142,7 +142,7 @@ class App extends Component {
       );
 		}
 
-    const { Address, Name, Wishes } = this.state.to;
+    const { Address, Name, Wishes, RName } = this.state.to;
 
     if (!Wishes) {
       return (
@@ -166,7 +166,7 @@ class App extends Component {
         />
         <p style={{ marginLeft: '20px' }}>My chimney is currently out of order so you can just send my gift to <strong>{Address}</strong></p>
         <p style={{ marginTop: '40px' }}>-Merry Christmas,</p>
-        <p style={{ marginTop: '-5px', marginLeft: '5px' }}>{Name} <span style={{ fontSize: '9px' }} >(aka {this.state.you.RName})</span></p>
+        <p style={{ marginTop: '-5px', marginLeft: '5px' }}>{Name} <span style={{ fontSize: '9px' }} >(aka {RName})</span></p>
       </div>
     );
   }
