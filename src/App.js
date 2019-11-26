@@ -88,7 +88,7 @@ class App extends Component {
     if (!this.state.code.personId) {
       return (
         <span>
-          The North Pole Postal Service is running behind, please send <strong>@mitchdzugan</strong> this code: <strong>{this.state.code.slsCode}</strong> to receive your letter to Santa.
+          The North Pole Postal Service is running behind, please send <strong>@mitchdzugan</strong> this code: <strong>{this.state.code.slsCode}</strong> to get your computer connected to Santa HQ.
         </span>
       );
     }
