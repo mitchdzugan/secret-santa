@@ -15,7 +15,7 @@
 
 @media (min-width: 901px) {
 	.letter {
-		margin: 30px 100px;
+		margin: 30px auto;
 		padding: 30px 50px;
 	}
 
@@ -55,6 +55,7 @@ code {
 .letter {
 	background-color: #fdfdfd;
 	filter: drop-shadow(10px 10px 4px #444444);
+	max-width: 800px;
 }
 
 .chat {

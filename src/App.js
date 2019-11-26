@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { markdown } from 'markdown';
 
 const firebase = window.firebase;
 
@@ -100,8 +101,57 @@ class App extends Component {
         </div>
       );
     }
+    const setAddress = () => {
+      db.collection('People').doc(this.state.code.personId).set({
+        ...this.state.you,
+        Address: this.state.youAddress || this.state.you.Address
+      });
+    };
+    const submit = () => {
+      db.collection('People').doc(this.state.code.personId).set({
+        ...this.state.you,
+        Address: this.state.youAddress || this.state.you.Address,
+        Wishes: this.state.youWishes || this.state.you.Wishes
+      }).then(() => this.setState({ youAddress: null, youWishes: null, editWishList: false }));
+    };
+		if (!this.state.you.Wishes || this.state.editWishList) {
+			return ( 
+        <div style={{ display: 'flex', flexDirection: 'column' }} >
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} >
+            <div>
+              <input 
+                value={this.state.youAddress || this.state.you.Address}
+                onChange={e => this.setState({ youAddress: e.target.value })}
+              />
+              <button onClick={setAddress} style={{ marginLeft: '10px' }} >Save Address</button>
+            </div>
+            <div>
+              <button onClick={() => this.setState({ isPreview: !this.state.isPreview })} >
+                {this.state.isPreview ? "Edit" : "Preview"}
+              </button>
+            </div> 
+          </div>
+          <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', margin: '15px' }} >Enter Your Wish List</div>
+          {this.state.isPreview ? null : <textarea value={this.state.youWishes || this.state.you.Wishes} 
+                                                   onChange={e => this.setState({ youWishes: e.target.value })} 
+                                                   style={{ minHeight: '50vh' }}
+                                         />}
+          {!this.state.isPreview ? null : <div dangerouslySetInnerHTML={{ __html: markdown.toHTML(this.state.youWishes || this.state.you.Wishes || '') }} />}
+          <div style={{ textAlign: 'center', marginTop: '20px' }} > <button onClick={submit} >Submit</button> </div> 
+        </div>
+      );
+		}
 
     const { Address, Name, Wishes } = this.state.to;
+
+    if (!Wishes) {
+      return (
+        <span>
+          The North Pole Postal Service is running behind, we are still waiting to receive your letter to Santa. It will show up here as soon as its available.
+        </span>
+      );
+    }
+
 
     return (
       <div>
@@ -111,14 +161,21 @@ class App extends Component {
           leads when I was really triggered so I think I deserve to be on the nice list. If you
           agree please get me something from this list:
         </p>
-        <p style={{ marginLeft: '20px' }}>{Wishes}</p>
+        <p style={{ marginLeft: '20px' }}
+           dangerouslySetInnerHTML={{ __html: markdown.toHTML(Wishes) }}
+        />
         <p style={{ marginLeft: '20px' }}>My chimney is currently out of order so you can just send my gift to <strong>{Address}</strong></p>
-        <p style={{ marginTop: '40px' }}>-Merry Christmas, {Name}</p>
+        <p style={{ marginTop: '40px' }}>-Merry Christmas,</p>
+        <p style={{ marginTop: '-5px', marginLeft: '5px' }}>{Name} <span style={{ fontSize: '9px' }} >(aka {this.state.you.RName})</span></p>
       </div>
     );
   }
 
 	renderChat (p, id, personId, title) {
+		if (!this.state.you || !this.state.you.Wishes || !this.state.to || !this.state.to.Wishes) {
+			return null;
+		}
+
     const messages = p.messages || [];
     const messagesEl = !messages.length ?
       <div className="emptyMessages">no messages</div> : messages.map(
@@ -175,15 +232,27 @@ class App extends Component {
 
   render () {
 		const fullyLoaded = this.state.to && this.state.you;
+    const hasWishes = this.state.you && this.state.you.Wishes
+    const wishEditButton = (
+      <div style={{ position: 'fixed', bottom: '50px', width: '100vw', textAlign: 'center' }} >
+        <button style={{ filter: 'drop-shadow(10px 10px 4px #444444)', padding: '5px' }}
+                onClick={() => this.setState({ editWishList: true })}
+                className="ewlb"
+        >
+          Edit Your Wishlist
+        </button>
+      </div>
+    );
     return (
 			<div>
+        {!hasWishes || this.state.editWishList ? null : wishEditButton}
 				<div className="letter">
 					{this.renderContent()}
 				</div>
 				{fullyLoaded && (
 					<div className="chatsHolder">
-            {this.renderChat(this.state.to, this.state.code.toId, this.state.code.personId)}
             {this.renderChat(this.state.you, this.state.code.personId, this.state.code.personId, 'your santa')}
+            {this.renderChat(this.state.to, this.state.code.toId, this.state.code.personId)}
 					</div>
 				)}
 			</div>
