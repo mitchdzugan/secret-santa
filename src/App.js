@@ -146,9 +146,24 @@ class App extends Component {
 
     if (!Wishes) {
       return (
-        <span>
-          The North Pole Postal Service is running behind, we are still waiting to receive your letter to Santa. It will show up here as soon as its available.
-        </span>
+        <div>
+          <p>
+            You will be getting a gift for:
+          </p>
+          <p
+              style={{ textAlign: 'center', fontSize: '20px', marginTop: '-15px',  }}
+          >
+            <span style={{ fontWeight: 'bold' }} >
+              {Name}&nbsp;
+            </span>
+            <span style={{ fontSize: '9px' }} >
+              (aka {RName})
+            </span>
+          </p>
+          <p>
+            We are still waiting to receive their letter to you. It will show up here as soon as its available.
+          </p>
+        </div>
       );
     }
 
@@ -178,7 +193,8 @@ class App extends Component {
 
     const messages = p.messages || [];
     const messagesEl = !messages.length ?
-      <div className="emptyMessages">no messages</div> : messages.map(
+      <div className="emptyMessages">no messages</div> :
+      messages.map(
         ({ from, body }, ind) => (
           <div key={ind} className={`message ${from === personId ? 'fromMe' : 'fromOther'}`}>
             <div className="messageSpacer" />
